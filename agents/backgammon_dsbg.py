@@ -1,6 +1,6 @@
 '''
 Name(s): yishu fang, tommy zhao
-UW netid(s): yishuf,
+UW netid(s): yishuf, tommzh
 '''
 
 from game_engine import genmoves
@@ -11,13 +11,14 @@ class BackgammonPlayer:
     def __init__(self):
         self.GenMoveInstance = genmoves.GenMoves()
         self.maxply = 2
-        # feel free to create more instance variables as needed.
+        self.special = None
+        self.evalCount = None
 
     # TODO: return a string containing your UW NETID(s)
     # For students in partnership: UWNETID + " " + UWNETID
     def nickname(self):
         # TODO: return a string representation of your UW netid(s)
-        return "yishuf"
+        return "yishuf" + " " + "tommzh"
 
     # If prune==True, then your Move method should use Alpha-Beta Pruning
     # otherwise Minimax
@@ -42,8 +43,8 @@ class BackgammonPlayer:
     # If not None, it update the internal static evaluation
     # function to be func
     def useSpecialStaticEval(self, func):
-        if func != None:
-            self.func = func
+        if func is not None:
+            self.special = func
 
 
     # Given a state and a roll of dice, it returns the best move for
@@ -111,9 +112,12 @@ class BackgammonPlayer:
     # Hint: Look at game_engine/boardState.py for a board state properties you can use.
     def staticEval(self, state):
         # TODO: return a number for the given state
-        self.evalCount = [[0,0,0,0,0,0],[0,0,0,0,0,0]]
+        if self.special is not None:
+            return self.special(state)
+
+        self.evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         for i in range(4):
-            for x in self.pointLists[i*6:(i+1)*6]:
+            for x in self.pointLists[i * 6:(i + 1) * 6]:
                 if x != None:
                     if x[0] == 0:
                         self.evalCount[0][i] += len(x)
@@ -127,7 +131,11 @@ class BackgammonPlayer:
             elif x == 1:
                 self.evalCount[1][6] += 1
 
-        return 100*(self.evalCount[0][6]-self.evalCount[1][6]) + 90*(self.evalCount[0][4]-self.evalCount[1][1]) + 50*(self.evalCount[0][3]-self.evalCount[1][2])- 50*(self.evalCount[0][2]-self.evalCount[1][3])-90*(self.evalCount[0][1]-self.evalCount[1][4])-100*(self.evalCount[0][5]-self.evalCount[1][5])
+        return 100 * (self.evalCount[0][6] - self.evalCount[1][6]) + 90 * (
+                    self.evalCount[0][4] - self.evalCount[1][1]) + 50 * (
+                    self.evalCount[0][3] - self.evalCount[1][2]) - 50 * (
+                    self.evalCount[0][2] - self.evalCount[1][3]) - 90 * (
+                    self.evalCount[0][1] - self.evalCount[1][4]) - 100 * (self.evalCount[0][5] - self.evalCount[1][5])
     def get_all_possible_moves(self):
         """Uses the mover to generate all legal moves. Returns an array of move commands"""
         move_list = []
@@ -145,6 +153,12 @@ class BackgammonPlayer:
         if not any_non_pass_moves:
             move_list.append('p')
         return move_list
+
+
+
+
+
+
 
 
 
