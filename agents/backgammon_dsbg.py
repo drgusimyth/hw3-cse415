@@ -53,8 +53,7 @@ class BackgammonPlayer:
         # TODO: return a move for the current state and for the current player.
         # Hint: you can get the current player with state.whose_move
         if self.get_all_possible_moves(self) == []:
-            # pass move
-            pass
+            return 'p'
         if self.prune == False:
             # use minimax
             #if no move avaliable ( == 0)
@@ -71,13 +70,13 @@ class BackgammonPlayer:
         if maxply == 0:
             return self.staticEval(self,state)
         if maxPlayer:
-            maxEval = -1000000
+            maxEval = -1e20
             for x in self.get_all_possible_moves(self):
                 eval = self.minimax(x, maxply - 1, False)
                 maxEval = max(eval,maxEval)
             return maxEval
         else:
-            minEval = 1000000
+            minEval = 1e20
             for x in self.get_all_possible_moves(self):
                 eval = self.minimax(x, maxply - 1, True)
                 minEval = min(eval,minEval)
@@ -86,8 +85,28 @@ class BackgammonPlayer:
 
 
 
-    def minimaxAB(self, state, maxply, maxPlayer):
-        pass
+    def minimaxAB(self, state, maxply, alpha,beta, maxPlayer):
+        if maxply == 0:
+            return self.staticEval(self,state)
+        if maxPlayer:
+            maxEval = -1000000
+            for x in self.get_all_possible_moves(self):
+                eval = self.minimax(x, maxply - 1, alpha,beta, False)
+                maxEval = max(eval,maxEval)
+                alpha = max(alpha,eval)
+                if beta <= alpha:
+                    break
+            return maxEval
+        else:
+            minEval = 1000000
+            for x in self.get_all_possible_moves(self):
+                eval = self.minimax(x, maxply - 1, alpha,beta,True)
+                minEval = min(eval,minEval)
+                beta = min(beta,eval)
+                if beta <= alpha:
+                    break
+            return minEval
+
 
     # Hint: Look at game_engine/boardState.py for a board state properties you can use.
     def staticEval(self, state):
