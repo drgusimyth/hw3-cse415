@@ -113,8 +113,7 @@ class BackgammonPlayer:
     def staticEval(self, state):
         # TODO: return a number for the given state
         if self.special is not None:
-            return self.special(state)
-
+            return self.special(self, state)
         self.evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         for i in range(4):
             for x in self.pointLists[i * 6:(i + 1) * 6]:

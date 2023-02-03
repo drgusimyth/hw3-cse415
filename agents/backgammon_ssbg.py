@@ -72,6 +72,7 @@ class BackgammonPlayer:
             score = expectimax(x, maxply, True);
             if score > best_score:
                 best_move = x
+                best_score = score
         return best_move
 
 
@@ -98,7 +99,7 @@ class BackgammonPlayer:
     def staticEval(self, state):
         # TODO: return a number for the given state
         if self.special is not None:
-            return self.special(state)
+            return self.special(self, state)
 
         self.evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         for i in range(4):
