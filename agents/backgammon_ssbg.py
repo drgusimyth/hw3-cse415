@@ -21,13 +21,15 @@ class BackgammonPlayer:
     # as a ply too!
     def setMaxPly(self, maxply=2):
         # TODO: set the max ply
-        pass
+        self.maxply = maxply
+
 
     # If not None, it update the internal static evaluation
     # function to be func
     def useSpecialStaticEval(self, func):
         # TODO: update your staticEval function appropriately
-        pass
+        if func != None:
+            self.func = func
 
     # Given a state and a roll of dice, it returns the best move for
     # the state.whose_move
@@ -41,4 +43,4 @@ class BackgammonPlayer:
     # Hint: Look at game_engine/boardState.py for a board state properties you can use.
     def staticEval(self, state):
         # TODO: return a number for the given state
-        return -1
+
