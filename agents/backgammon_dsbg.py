@@ -23,7 +23,7 @@ class BackgammonPlayer:
     # otherwise Minimax
     def useAlphaBetaPruning(self, prune=False):
         # TODO: use the prune flag to indiciate what search alg to use
-
+        self.prune = prune
 
     # Returns a tuple containing the number explored
     # states as well as the number of cutoffs.
@@ -52,23 +52,42 @@ class BackgammonPlayer:
     def move(self, state, die1=1, die2=6):
         # TODO: return a move for the current state and for the current player.
         # Hint: you can get the current player with state.whose_move
-
-        if prune == False:
-            #use minimax
+        if self.get_all_possible_moves(self) == []:
+            # pass move
+            pass
+        if self.prune == False:
+            # use minimax
             #if no move avaliable ( == 0)
                 #pass, so return current state
+            pass
         else:
-            #use alphabeta pruning
-
+            # use alphabeta pruning
+            pass
+        pass
 
 
     def minimax(self, state, maxply, maxPlayer):
         #how to use the number for dice
+        if maxply == 0:
+            return self.staticEval(self,state)
+        if maxPlayer:
+            maxEval = -1000000
+            for x in self.get_all_possible_moves(self):
+                eval = self.minimax(x, maxply - 1, False)
+                maxEval = max(eval,maxEval)
+            return maxEval
+        else:
+            minEval = 1000000
+            for x in self.get_all_possible_moves(self):
+                eval = self.minimax(x, maxply - 1, True)
+                minEval = min(eval,minEval)
+            return minEval
+
 
 
 
     def minimaxAB(self, state, maxply, maxPlayer):
-
+        pass
 
     # Hint: Look at game_engine/boardState.py for a board state properties you can use.
     def staticEval(self, state):
@@ -89,8 +108,24 @@ class BackgammonPlayer:
             elif x == 1:
                 self.evalCount[1][6] += 1
 
-        return 100(self.evalCount[0][6]-self.evalCount[1][6]) + 90(self.evalCount[0][4]-self.evalCount[1][1]) + 50(self.evalCount[0][3]-self.evalCount[1][2])- 50(self.evalCount[0][2]-self.evalCount[1][3])-90(self.evalCount[0][1]-self.evalCount[1][4])-100self.evalCount[0][5]-self.evalCount[1][5]
-
+        return 100*(self.evalCount[0][6]-self.evalCount[1][6]) + 90*(self.evalCount[0][4]-self.evalCount[1][1]) + 50*(self.evalCount[0][3]-self.evalCount[1][2])- 50*(self.evalCount[0][2]-self.evalCount[1][3])-90*(self.evalCount[0][1]-self.evalCount[1][4])-100*(self.evalCount[0][5]-self.evalCount[1][5])
+    def get_all_possible_moves(self):
+        """Uses the mover to generate all legal moves. Returns an array of move commands"""
+        move_list = []
+        done_finding_moves = False
+        any_non_pass_moves = False
+        while not done_finding_moves:
+            try:
+                m = next(self.move_generator)    # Gets a (move, state) pair.
+                # print("next returns: ",m[0]) # Prints out the move.    For debugging.
+                if m[0] != 'p':
+                    any_non_pass_moves = True
+                    move_list.append(m[0])    # Add the move to the list.
+            except StopIteration as e:
+                done_finding_moves = True
+        if not any_non_pass_moves:
+            move_list.append('p')
+        return move_list
 
 
 
