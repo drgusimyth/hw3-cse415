@@ -19,18 +19,22 @@ class BackgammonPlayer:
     def nickname(self):
         # TODO: return a string representation of your UW netid(s)
         return "yishuf" + " " + "tommzh"
+    def initialize_move_gen_for_state(self, state, who, die1=1, die2=6):
+        self.move_generator = self.GenMoveInstance.gen_moves(state, who, die1, die2)
 
     # If prune==True, then your Move method should use Alpha-Beta Pruning
     # otherwise Minimax
     def useAlphaBetaPruning(self, prune=False):
         # TODO: use the prune flag to indiciate what search alg to use
-        self.prune = prune
+        if prune != None:
+            self.prune = prune
 
     # Returns a tuple containing the number explored
     # states as well as the number of cutoffs.
     def statesAndCutoffsCounts(self):
         # TODO: return a tuple containing states and cutoff
-        return (-1,-1)
+        self.count = ()
+        return self.count
 
     # Given a ply, it sets a maximum for how far an agent
     # should go down in the search tree. maxply=2 indicates that
@@ -53,21 +57,21 @@ class BackgammonPlayer:
     def move(self, state, die1=1, die2=6):
         # TODO: return a move for the current state and for the current player.
         # Hint: you can get the current player with state.whose_move
-        if self.get_all_possible_moves(self) == []:
-            return 'p'
+        maxPlayer = state.whose_move
+        self.initialize_move_gen_for_state(state, maxPlayer, 1, 6)
+        if self.get_all_possible_moves() == []:
+            return 'no moves, pass'
         if self.prune == False:
-            # use minimax
-            #if no move avaliable ( == 0)
-                #pass, so return current state
-            pass
+            self.minimax(self,state,self.maxply,maxPlayer)
+
         else:
-            # use alphabeta pruning
-            pass
-        pass
+            self.minimaxAB(self,state,-1000000,1000000,maxPlayer)
+
 
 
     def minimax(self, state, maxply, maxPlayer):
         #how to use the number for dice
+        self.initialize_move_gen_for_state(state, maxPlayer, 1, 6)
         if maxply == 0:
             return self.staticEval(self,state)
         if maxPlayer:
@@ -87,6 +91,7 @@ class BackgammonPlayer:
 
 
     def minimaxAB(self, state, maxply, alpha,beta, maxPlayer):
+        self.initialize_move_gen_for_state(state,maxPlayer,1, 6)
         if maxply == 0:
             return self.staticEval(self,state)
         if maxPlayer:
@@ -112,8 +117,9 @@ class BackgammonPlayer:
     # Hint: Look at game_engine/boardState.py for a board state properties you can use.
     def staticEval(self, state):
         # TODO: return a number for the given state
-        if self.special is not None:
-            return self.special(self, state)
+        if self.special is not None :
+            return self.special(state)
+
         self.evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         for i in range(4):
             for x in self.pointLists[i * 6:(i + 1) * 6]:

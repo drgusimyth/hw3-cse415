@@ -69,7 +69,7 @@ class BackgammonPlayer:
         best_move = None
         best_score = -2147483649
         for x in moves:
-            score = expectimax(x, maxply, True);
+            score = self.expectimax(x, self.maxply, True)
             if score > best_score:
                 best_move = x
                 best_score = score
@@ -77,7 +77,7 @@ class BackgammonPlayer:
 
 
     def expectimax(self, state, maxply, maxPlayer):
-        self.initialize_move_gen_for_state(state, state.whose_move, die1, die2)
+        self.initialize_move_gen_for_state(state, state.whose_move)
         moves = self.get_all_moves()
         if maxply == 0:
             return self.staticEval(self,state)
