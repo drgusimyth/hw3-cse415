@@ -15,6 +15,10 @@ class BackgammonPlayer:
         self.evalCount = None
         self.prune = None
 
+        # counters
+        self.states_created = 0
+        self.ab_cutoffs = 0
+
     # TODO: return a string containing your UW NETID(s)
     # For students in partnership: UWNETID + " " + UWNETID
     def nickname(self):
@@ -117,23 +121,27 @@ class BackgammonPlayer:
         if maxPlayer:
             maxEval = -1000000
             for x in self.get_all_possible_moves():
+                self.states_created += 1
                 s = getSourceAndTargetFromMove(x)
                 temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
                 eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta, False)
                 maxEval = max(eval,maxEval)
                 alpha = max(alpha,eval)
                 if beta <= alpha:
+                    self.ab_cutoffs += 1
                     break
             return maxEval
         else:
             minEval = 1000000
             for x in self.get_all_possible_moves():
+                self.states_created += 1
                 s = getSourceAndTargetFromMove(x)
                 temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
                 eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta,True)
                 minEval = min(eval,minEval)
                 beta = min(beta,eval)
                 if beta <= alpha:
+                    self.ab_cutoffs += 1
                     break
             return minEval
 
