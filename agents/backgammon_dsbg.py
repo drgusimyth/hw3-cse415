@@ -98,21 +98,29 @@ class BackgammonPlayer:
             maxEval = -1e20
             for x in self.get_all_possible_moves():
                 self.states_created += 1
-                s = getSourceAndTargetFromMove(x)
-                if s != None:
-                    temp_state = genmoves.move_from(state,state.whose_move,s[0],s[1],1-state.whose_move)
-                    eval = self.minimax(temp_state, maxply - 1, False)
-                    maxEval = max(eval,maxEval)
+                s = getSourceAndTargetFromMove(x, [1, 6])
+                temp_state = state
+                if s[0] != []:
+                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[0][0], sum(s[0]), 1 - state.whose_move)
+                if s[1] != []:
+                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[1][0], sum(s[1]), 1 - state.whose_move)
+
+                eval = self.minimax(temp_state, maxply - 1, False)
+                maxEval = max(eval,maxEval)
             return maxEval
         else:
             minEval = 1e20
             for x in self.get_all_possible_moves():
                 self.states_created += 1
-                s = getSourceAndTargetFromMove(x)
-                if s != None:
-                    temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
-                    eval = self.minimax(temp_state, maxply - 1, True)
-                    minEval = min(eval,minEval)
+                s = getSourceAndTargetFromMove(x, [1, 6])
+                temp_state = state
+                if s[0] != []:
+                    temp_state = genmoves.move_from(state, state.whose_move, s[0][0], sum(s[0]), 1 - state.whose_move)
+                if s[1] != []:
+                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[1][0], sum(s[1]), 1 - state.whose_move)
+
+                eval = self.minimax(temp_state, maxply - 1, True)
+                minEval = min(eval,minEval)
             return minEval
 
 
@@ -126,29 +134,36 @@ class BackgammonPlayer:
             maxEval = -1000000
             for x in self.get_all_possible_moves():
                 self.states_created += 1
-                s = getSourceAndTargetFromMove(x)
-                if s != None:
-                    temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
-                    eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta, False)
-                    maxEval = max(eval,maxEval)
-                    alpha = max(alpha,eval)
-                    if beta <= alpha:
-                        self.ab_cutoffs += 1
-                        break
+                s = getSourceAndTargetFromMove(x,[1,6])
+                temp_state = state
+                if s[0] != []:
+                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[0][0], sum(s[0]), 1 - state.whose_move)
+                if s[1] != []:
+                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[1][0], sum(s[1]), 1 - state.whose_move)
+
+                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta, False)
+                maxEval = max(eval,maxEval)
+                alpha = max(alpha,eval)
+                if beta <= alpha:
+                    self.ab_cutoffs += 1
+                    break
             return maxEval
         else:
             minEval = 1000000
             for x in self.get_all_possible_moves():
-                s = getSourceAndTargetFromMove(x)
-                self.states_created += 1
-                if s != None:
-                    temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
-                    eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta,True)
-                    minEval = min(eval,minEval)
-                    beta = min(beta,eval)
-                    if beta <= alpha:
-                        self.ab_cutoffs += 1
-                        break
+                s = getSourceAndTargetFromMove(x, [1, 6])
+                temp_state = state
+                if s[0] != []:
+                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[0][0], sum(s[0]), 1 - state.whose_move)
+                if s[1] != []:
+                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[1][0], sum(s[1]), 1 - state.whose_move)
+
+                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta,True)
+                minEval = min(eval,minEval)
+                beta = min(beta,eval)
+                if beta <= alpha:
+                    self.ab_cutoffs += 1
+                    break
             return minEval
 
 
@@ -200,27 +215,29 @@ class BackgammonPlayer:
             move_list.append('p')
         return move_list
 
-def getSourceAndTargetFromMove(move):
-    sPt = ''
-    tPt = ''
-    firstOrSencond = True
-    for s in move:
-        if firstOrSencond:
-            if s == 'p':
-                return None
-            elif s != ',':
-                sPt += s
-            else:
-                firstOrSencond = False
-        else:
-            if s == 'p':
-                return None
-            elif s != ',':
-                tPt += s
-            else:
-                break
-    return [int(sPt)-1, int(tPt)-1]
+def getSourceAndTargetFromMove(move,dice=[1,6]):
+    checker_positions = move.split(",")
+    if checker_positions == [] or checker_positions == 'p':
+        return[[],[]]
 
+    if len(checker_positions) == 3 and checker_positions[2] == 'R':
+        first_dice = dice[1]
+        second_dice = dice[0]
+    else:
+        first_dice = dice[0]
+        second_dice = dice[1]
+
+    if checker_positions[0] == 'p':
+        first_part = []
+    else:
+        first_part = [int(checker_positions[0])-1, first_dice]
+
+    if checker_positions[1] == 'p':
+        second_part = []
+    else:
+        second_part = [int(checker_positions[1])-1, second_dice]
+
+    return[first_part, second_part]
 
 
 
