@@ -13,6 +13,7 @@ class BackgammonPlayer:
         self.maxply = 2
         self.special = None
         self.evalCount = None
+        self.prune = None
 
     # TODO: return a string containing your UW NETID(s)
     # For students in partnership: UWNETID + " " + UWNETID
@@ -27,7 +28,10 @@ class BackgammonPlayer:
     def useAlphaBetaPruning(self, prune=False):
         # TODO: use the prune flag to indiciate what search alg to use
         if prune != None:
-            self.prune = prune
+            if prune == False:
+                self.prune = False
+            else:
+                self.prune = True
 
     # Returns a tuple containing the number explored
     # states as well as the number of cutoffs.
@@ -59,13 +63,26 @@ class BackgammonPlayer:
         # Hint: you can get the current player with state.whose_move
         maxPlayer = state.whose_move
         self.initialize_move_gen_for_state(state, maxPlayer, 1, 6)
-        if self.get_all_possible_moves() == []:
+        moves = self.get_all_possible_moves()
+        if moves == 0:
             return 'no moves, pass'
+        best_move = None
+        best_score = -21493846950
         if self.prune == False:
-            self.minimax(self,state,self.maxply,maxPlayer)
+            for x in moves:
+                score =  self.minimax(self,state,self.maxply,maxPlayer)
+                if score > best_score:
+                    best_move = x
+                    best_score = score
+            return best_move
 
         else:
-            self.minimaxAB(self,state,-1000000,1000000,maxPlayer)
+            for x in moves:
+                score = self.minimaxAB(state,-1000000,1000000,maxPlayer)
+                if score > best_score:
+                    best_move = x
+                    best_score = score
+            return best_move
 
 
 
@@ -105,7 +122,7 @@ class BackgammonPlayer:
             return maxEval
         else:
             minEval = 1000000
-            for x in self.get_all_possible_moves(self):
+            for x in self.get_all_possible_moves():
                 eval = self.minimax(x, maxply - 1, alpha,beta,True)
                 minEval = min(eval,minEval)
                 beta = min(beta,eval)
