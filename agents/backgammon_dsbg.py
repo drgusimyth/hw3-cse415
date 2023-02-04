@@ -120,7 +120,6 @@ class BackgammonPlayer:
 
     def minimaxAB(self, state, maxply, alpha,beta, maxPlayer):
         self.initialize_move_gen_for_state(state,maxPlayer,1,6)
-
         if maxply == 0:
             return self.staticEval(state)
         if maxPlayer:
