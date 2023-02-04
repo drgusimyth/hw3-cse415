@@ -94,17 +94,19 @@ class BackgammonPlayer:
             maxEval = -1e20
             for x in self.get_all_possible_moves():
                 s = getSourceAndTargetFromMove(x)
-                temp_state = genmoves.move_from(state,state.whose_move,s[0],s[1],1-state.whose_move)
-                eval = self.minimax(temp_state, maxply - 1, False)
-                maxEval = max(eval,maxEval)
+                if s != None:
+                    temp_state = genmoves.move_from(state,state.whose_move,s[0],s[1],1-state.whose_move)
+                    eval = self.minimax(temp_state, maxply - 1, False)
+                    maxEval = max(eval,maxEval)
             return maxEval
         else:
             minEval = 1e20
             for x in self.get_all_possible_moves():
                 s = getSourceAndTargetFromMove(x)
-                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
-                eval = self.minimax(temp_state, maxply - 1, True)
-                minEval = min(eval,minEval)
+                if s != None:
+                    temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
+                    eval = self.minimax(temp_state, maxply - 1, True)
+                    minEval = min(eval,minEval)
             return minEval
 
 
@@ -118,23 +120,25 @@ class BackgammonPlayer:
             maxEval = -1000000
             for x in self.get_all_possible_moves():
                 s = getSourceAndTargetFromMove(x)
-                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
-                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta, False)
-                maxEval = max(eval,maxEval)
-                alpha = max(alpha,eval)
-                if beta <= alpha:
-                    break
+                if s != None:
+                    temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
+                    eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta, False)
+                    maxEval = max(eval,maxEval)
+                    alpha = max(alpha,eval)
+                    if beta <= alpha:
+                        break
             return maxEval
         else:
             minEval = 1000000
             for x in self.get_all_possible_moves():
                 s = getSourceAndTargetFromMove(x)
-                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
-                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta,True)
-                minEval = min(eval,minEval)
-                beta = min(beta,eval)
-                if beta <= alpha:
-                    break
+                if s != None:
+                    temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
+                    eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta,True)
+                    minEval = min(eval,minEval)
+                    beta = min(beta,eval)
+                    if beta <= alpha:
+                        break
             return minEval
 
 
