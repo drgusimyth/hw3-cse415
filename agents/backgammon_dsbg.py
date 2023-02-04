@@ -97,6 +97,7 @@ class BackgammonPlayer:
         if maxPlayer:
             maxEval = -1e20
             for x in self.get_all_possible_moves():
+                self.states_created += 1
                 s = getSourceAndTargetFromMove(x)
                 if s != None:
                     temp_state = genmoves.move_from(state,state.whose_move,s[0],s[1],1-state.whose_move)
@@ -106,6 +107,7 @@ class BackgammonPlayer:
         else:
             minEval = 1e20
             for x in self.get_all_possible_moves():
+                self.states_created += 1
                 s = getSourceAndTargetFromMove(x)
                 if s != None:
                     temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
@@ -118,6 +120,7 @@ class BackgammonPlayer:
 
     def minimaxAB(self, state, maxply, alpha,beta, maxPlayer):
         self.initialize_move_gen_for_state(state,maxPlayer,1,6)
+
         if maxply == 0:
             return self.staticEval(state)
         if maxPlayer:
@@ -179,6 +182,7 @@ class BackgammonPlayer:
                       evalCount[0][1] - evalCount[1][2]) - 90 * (
                       evalCount[0][0] - evalCount[1][3]) - 100 * (
                       evalCount[0][4] - evalCount[1][4])
+
     def get_all_possible_moves(self):
         """Uses the mover to generate all legal moves. Returns an array of move commands"""
         move_list = []
@@ -186,11 +190,11 @@ class BackgammonPlayer:
         any_non_pass_moves = False
         while not done_finding_moves:
             try:
-                m = next(self.move_generator)    # Gets a (move, state) pair.
-                #print("next returns: ",m[0]) # Prints out the move.    For debugging.
+                m = next(self.move_generator)  # Gets a (move, state) pair.
+                # print("next returns: ",m[0]) # Prints out the move.    For debugging.
                 if m[0] != 'p':
                     any_non_pass_moves = True
-                    move_list.append(m[0])    # Add the move to the list.
+                    move_list.append(m[0])  # Add the move to the list.
             except StopIteration as e:
                 done_finding_moves = True
         if not any_non_pass_moves:
