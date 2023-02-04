@@ -84,13 +84,17 @@ class BackgammonPlayer:
         if maxPlayer: # max player's turn
             maxEval = -2147483649
             for x in moves:
-                eval = self.expectimax(x, maxply - 1, False)
+                s = getSourceAndTargetFromMove(x)
+                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
+                eval = self.expectimax(temp_state, maxply - 1, False)
                 maxEval = max(eval, maxEval)
             return maxEval
         else: #random player's turn
             total_eval = 0
             for x in moves:
-                total_eval += self.expectimax(x, maxply - 1, True)
+                s = getSourceAndTargetFromMove(x)
+                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
+                total_eval += self.expectimax(temp_state, maxply - 1, True)
             expected = total_eval / len(moves)
             return expected
 
@@ -98,29 +102,51 @@ class BackgammonPlayer:
     # Hint: Look at game_engine/boardState.py for a board state properties you can use.
     def staticEval(self, state):
         # TODO: return a number for the given state
-        if self.special is not None:
-            return self.special(self, state)
+        if self.special != None:
+            return self.special(state)
 
-        self.evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+        evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         for i in range(4):
-            for x in self.pointLists[i * 6:(i + 1) * 6]:
-                if x != None:
+            for x in state.pointLists[i * 6: (i + 1) * 6]:
+                if x != []:
                     if x[0] == 0:
-                        self.evalCount[0][i] += len(x)
-                    elif x[0] == 1:
-                        self.evalCount[1][i] += len(x)
-        self.evalCount[0][5] = state.white_off
-        self.evalCount[1][5] = state.red_off
+                        evalCount[0][i] += len(x)
+                    else:  # if x[0] == 1:
+                        evalCount[1][i] += len(x)
+        evalCount[0][4] = 0 if state.white_off == [] else state.white_off
+        evalCount[1][4] = 0 if state.red_off == [] else state.red_off
         for x in state.bar:
             if x == 0:
-                self.evalCount[0][6] += 1
-            elif x == 1:
-                self.evalCount[1][6] += 1
+                evalCount[0][5] += 1
+            else:  # x == 1
+                evalCount[1][5] += 1
 
-        return 100 * (self.evalCount[0][6] - self.evalCount[1][6]) + 90 * (
-                    self.evalCount[0][4] - self.evalCount[1][1]) + 50 * (
-                    self.evalCount[0][3] - self.evalCount[1][2]) - 50 * (
-                    self.evalCount[0][2] - self.evalCount[1][3]) - 90 * (
-                    self.evalCount[0][1] - self.evalCount[1][4]) - 100 * (self.evalCount[0][5] - self.evalCount[1][5])
+        # print(evalCount)
+        return 100 * (evalCount[0][5] - evalCount[1][5]) + 90 * (
+                evalCount[0][3] - evalCount[1][0]) + 50 * (
+                evalCount[0][2] - evalCount[1][1]) - 50 * (
+                evalCount[0][1] - evalCount[1][2]) - 90 * (
+                evalCount[0][0] - evalCount[1][3]) - 100 * (
+                evalCount[0][4] - evalCount[1][4])
 
 
+def getSourceAndTargetFromMove(move):
+    sPt = ''
+    tPt = ''
+    firstOrSencond = True
+    for s in move:
+        if firstOrSencond:
+            if s == 'p':
+                return None
+            elif s != ',':
+                sPt += s
+            else:
+                firstOrSencond = False
+        else:
+            if s == 'p':
+                return None
+            elif s != ',':
+                tPt += s
+            else:
+                break
+    return [int(sPt)-1, int(tPt)-1]

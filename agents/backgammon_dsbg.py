@@ -20,7 +20,7 @@ class BackgammonPlayer:
     def nickname(self):
         # TODO: return a string representation of your UW netid(s)
         return "yishuf" + " " + "tommzh"
-    def initialize_move_gen_for_state(self, state, who, die1=1, die2=6):
+    def initialize_move_gen_for_state(self, state, who, die1, die2):
         self.move_generator = self.GenMoveInstance.gen_moves(state, who, die1, die2)
 
     # If prune==True, then your Move method should use Alpha-Beta Pruning
@@ -28,10 +28,7 @@ class BackgammonPlayer:
     def useAlphaBetaPruning(self, prune=False):
         # TODO: use the prune flag to indiciate what search alg to use
         if prune != None:
-            if prune == False:
-                self.prune = False
-            else:
-                self.prune = True
+            self.prune = prune
 
     # Returns a tuple containing the number explored
     # states as well as the number of cutoffs.
@@ -70,7 +67,7 @@ class BackgammonPlayer:
         best_score = -21493846950
         if self.prune == False:
             for x in moves:
-                score =  self.minimax(self,state,self.maxply,maxPlayer)
+                score =  self.minimax(state,self.maxply,maxPlayer)
                 if score > best_score:
                     best_move = x
                     best_score = score
@@ -78,7 +75,7 @@ class BackgammonPlayer:
 
         else:
             for x in moves:
-                score = self.minimaxAB(state,-1000000,1000000,maxPlayer)
+                score = self.minimaxAB(state,self.maxply,-1000000,1000000,maxPlayer)
                 if score > best_score:
                     best_move = x
                     best_score = score
@@ -88,19 +85,25 @@ class BackgammonPlayer:
 
     def minimax(self, state, maxply, maxPlayer):
         #how to use the number for dice
-        self.initialize_move_gen_for_state(state, maxPlayer, 1, 6)
+
         if maxply == 0:
-            return self.staticEval(self,state)
+            return self.staticEval(state)
+
+        self.initialize_move_gen_for_state(state, maxPlayer, 1, 6)
         if maxPlayer:
             maxEval = -1e20
-            for x in self.get_all_possible_moves(self):
-                eval = self.minimax(x, maxply - 1, False)
+            for x in self.get_all_possible_moves():
+                s = getSourceAndTargetFromMove(x)
+                temp_state = genmoves.move_from(state,state.whose_move,s[0],s[1],1-state.whose_move)
+                eval = self.minimax(temp_state, maxply - 1, False)
                 maxEval = max(eval,maxEval)
             return maxEval
         else:
             minEval = 1e20
-            for x in self.get_all_possible_moves(self):
-                eval = self.minimax(x, maxply - 1, True)
+            for x in self.get_all_possible_moves():
+                s = getSourceAndTargetFromMove(x)
+                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
+                eval = self.minimax(temp_state, maxply - 1, True)
                 minEval = min(eval,minEval)
             return minEval
 
@@ -108,13 +111,15 @@ class BackgammonPlayer:
 
 
     def minimaxAB(self, state, maxply, alpha,beta, maxPlayer):
-        self.initialize_move_gen_for_state(state,maxPlayer,1, 6)
+        self.initialize_move_gen_for_state(state,maxPlayer,1,6)
         if maxply == 0:
-            return self.staticEval(self,state)
+            return self.staticEval(state)
         if maxPlayer:
             maxEval = -1000000
-            for x in self.get_all_possible_moves(self):
-                eval = self.minimax(x, maxply - 1, alpha,beta, False)
+            for x in self.get_all_possible_moves():
+                s = getSourceAndTargetFromMove(x)
+                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
+                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta, False)
                 maxEval = max(eval,maxEval)
                 alpha = max(alpha,eval)
                 if beta <= alpha:
@@ -123,7 +128,9 @@ class BackgammonPlayer:
         else:
             minEval = 1000000
             for x in self.get_all_possible_moves():
-                eval = self.minimax(x, maxply - 1, alpha,beta,True)
+                s = getSourceAndTargetFromMove(x)
+                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
+                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta,True)
                 minEval = min(eval,minEval)
                 beta = min(beta,eval)
                 if beta <= alpha:
@@ -134,30 +141,32 @@ class BackgammonPlayer:
     # Hint: Look at game_engine/boardState.py for a board state properties you can use.
     def staticEval(self, state):
         # TODO: return a number for the given state
-        if self.special is not None :
+        if self.special != None:
             return self.special(state)
 
-        self.evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+        evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         for i in range(4):
-            for x in self.pointLists[i * 6:(i + 1) * 6]:
-                if x != None:
+            for x in state.pointLists[i * 6 : (i + 1) * 6]:
+                if x != []:
                     if x[0] == 0:
-                        self.evalCount[0][i] += len(x)
-                    elif x[0] == 1:
-                        self.evalCount[1][i] += len(x)
-        self.evalCount[0][5] = state.white_off
-        self.evalCount[1][5] = state.red_off
+                        evalCount[0][i] += len(x)
+                    else: #if x[0] == 1:
+                        evalCount[1][i] += len(x)
+        evalCount[0][4] = 0 if state.white_off == [] else state.white_off
+        evalCount[1][4] = 0 if state.red_off == [] else state.red_off
         for x in state.bar:
             if x == 0:
-                self.evalCount[0][6] += 1
-            elif x == 1:
-                self.evalCount[1][6] += 1
+                evalCount[0][5] += 1
+            else: #x == 1
+                evalCount[1][5] += 1
 
-        return 100 * (self.evalCount[0][6] - self.evalCount[1][6]) + 90 * (
-                    self.evalCount[0][4] - self.evalCount[1][1]) + 50 * (
-                    self.evalCount[0][3] - self.evalCount[1][2]) - 50 * (
-                    self.evalCount[0][2] - self.evalCount[1][3]) - 90 * (
-                    self.evalCount[0][1] - self.evalCount[1][4]) - 100 * (self.evalCount[0][5] - self.evalCount[1][5])
+        #print(evalCount)
+        return 100 * (evalCount[0][5] - evalCount[1][5]) + 90 * (
+                      evalCount[0][3] - evalCount[1][0]) + 50 * (
+                      evalCount[0][2] - evalCount[1][1]) - 50 * (
+                      evalCount[0][1] - evalCount[1][2]) - 90 * (
+                      evalCount[0][0] - evalCount[1][3]) - 100 * (
+                      evalCount[0][4] - evalCount[1][4])
     def get_all_possible_moves(self):
         """Uses the mover to generate all legal moves. Returns an array of move commands"""
         move_list = []
@@ -166,7 +175,7 @@ class BackgammonPlayer:
         while not done_finding_moves:
             try:
                 m = next(self.move_generator)    # Gets a (move, state) pair.
-                # print("next returns: ",m[0]) # Prints out the move.    For debugging.
+                #print("next returns: ",m[0]) # Prints out the move.    For debugging.
                 if m[0] != 'p':
                     any_non_pass_moves = True
                     move_list.append(m[0])    # Add the move to the list.
@@ -176,7 +185,26 @@ class BackgammonPlayer:
             move_list.append('p')
         return move_list
 
-
+def getSourceAndTargetFromMove(move):
+    sPt = ''
+    tPt = ''
+    firstOrSencond = True
+    for s in move:
+        if firstOrSencond:
+            if s == 'p':
+                return None
+            elif s != ',':
+                sPt += s
+            else:
+                firstOrSencond = False
+        else:
+            if s == 'p':
+                return None
+            elif s != ',':
+                tPt += s
+            else:
+                break
+    return [int(sPt)-1, int(tPt)-1]
 
 
 
