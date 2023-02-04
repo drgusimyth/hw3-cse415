@@ -4,6 +4,7 @@ UW netid(s): yishuf, tommzh
 '''
 
 from game_engine import genmoves
+from game_engine import boardState
 
 class BackgammonPlayer:
 
@@ -72,15 +73,30 @@ class BackgammonPlayer:
         if self.prune == False:
             for x in moves:
                 self.states_created += 1
-                s = getSourceAndTargetFromMove(x,[1,6])
-                temp_state = state
+                s = getSourceAndTargetFromMove(x,[die1,die2])
+                temp_state = boardState.bgstate(state)
                 if s[0] != []:
-                    temp_state = genmoves.move_from(temp_state,temp_state.whose_move,s[0][0],sum(s[0]),1-temp_state.whose_move)
+                    if s[0][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[0]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[0][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]),
+                                                        1 - temp_state.whose_move)
                 if s[1] != []:
-                    temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]),
-                                                    1 - temp_state.whose_move)
-                state.whose_move = 1 - state.whose_move
-                score =  self.minimax(state,self.maxply,maxPlayer)
+                    if s[1][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[1]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[1]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[1][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]),
+                                                        1 - temp_state.whose_move)
+                temp_state.whose_move = 1 - temp_state.whose_move
+                score =  self.minimax(temp_state,self.maxply,maxPlayer)
                 if score > best_score:
                     best_move = x
                     best_score = score
@@ -89,14 +105,30 @@ class BackgammonPlayer:
         else:
             for x in moves:
                 self.states_created += 1
-                s = getSourceAndTargetFromMove(x, [1,6])
-                temp_state = state
+                s = getSourceAndTargetFromMove(x, [die1,die2])
+                temp_state = boardState.bgstate(state)
                 if s[0] != []:
-                    temp_state = genmoves.move_from(temp_state, temp_state.whose_move,s[0][0],sum(s[0]),1-temp_state.whose_move)
+                    if s[0][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[0]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[0][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]),
+                                                        1 - temp_state.whose_move)
                 if s[1] != []:
-                    temp_state = genmoves.move_from(temp_state,temp_state.whose_move,s[1][0],sum(s[1]),1-temp_state.whose_move)
-                state.whose_move = 1 - state.whose_move
-                score = self.minimaxAB(state,self.maxply,-1000000,1000000,maxPlayer)
+                    if s[1][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[1]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[1]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[1][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]),
+                                                        1 - temp_state.whose_move)
+                temp_state.whose_move = 1 - temp_state.whose_move
+                score = self.minimaxAB(temp_state,self.maxply,-1000000,1000000,maxPlayer)
                 if score > best_score:
                     best_move = x
                     best_score = score
@@ -116,13 +148,23 @@ class BackgammonPlayer:
             for x in self.get_all_possible_moves():
                 self.states_created += 1
                 s = getSourceAndTargetFromMove(x, [1, 6])
-                temp_state = state
+                temp_state = boardState.bgstate(state)
                 if s[0] != []:
-                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[0][0], sum(s[0]), 1 - state.whose_move)
+                    if s[0][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state,temp_state.whose_move,sum(s[0]), 1- temp_state.whose_move)
+                    elif sum(s[0]) > 23:
+                        temp_state = genmoves.bear_off(temp_state,temp_state.whose_move,s[0][0], 1-temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]), 1 - temp_state.whose_move)
                 if s[1] != []:
-                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[1][0], sum(s[1]), 1 - state.whose_move)
+                    if s[1][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state,temp_state.whose_move,sum(s[1]), 1- temp_state.whose_move)
+                    elif sum(s[1]) > 23:
+                        temp_state = genmoves.bear_off(temp_state,temp_state.whose_move,s[1][0], 1-temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]), 1 - temp_state.whose_move)
                 temp_state.whose_move = 1 - temp_state.whose_move
-                eval = self.minimax(temp_state, maxply - 1, False)
+                eval = self.minimax(temp_state, maxply - 1, maxPlayer)
                 maxEval = max(eval,maxEval)
             return maxEval
         else:
@@ -130,13 +172,29 @@ class BackgammonPlayer:
             for x in self.get_all_possible_moves():
                 self.states_created += 1
                 s = getSourceAndTargetFromMove(x, [1, 6])
-                temp_state = state
+                temp_state = boardState.bgstate(state)
                 if s[0] != []:
-                    temp_state = genmoves.move_from(state, state.whose_move, s[0][0], sum(s[0]), 1 - state.whose_move)
+                    if s[0][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[0]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[0][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]),
+                                                        1 - temp_state.whose_move)
                 if s[1] != []:
-                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[1][0], sum(s[1]), 1 - state.whose_move)
+                    if s[1][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[1]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[1]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[1][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]),
+                                                        1 - temp_state.whose_move)
                 temp_state.whose_move = 1 - temp_state.whose_move
-                eval = self.minimax(temp_state, maxply - 1, True)
+                eval = self.minimax(temp_state, maxply - 1, maxPlayer)
                 minEval = min(eval,minEval)
             return minEval
 
@@ -152,13 +210,28 @@ class BackgammonPlayer:
             for x in self.get_all_possible_moves():
                 self.states_created += 1
                 s = getSourceAndTargetFromMove(x,[1,6])
-                temp_state = state
+                temp_state = boardState.bgstate(state)
                 if s[0] != []:
-                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[0][0], sum(s[0]), 1 - state.whose_move)
+                    if s[0][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[0]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[0][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]),
+                                                        1 - temp_state.whose_move)
                 if s[1] != []:
-                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[1][0], sum(s[1]), 1 - state.whose_move)
+                    if s[1][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[1]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[1]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[1][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]), 1 - temp_state.whose_move)
                 temp_state.whose_move = 1 - temp_state.whose_move
-                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta, False)
+                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta, maxPlayer)
                 maxEval = max(eval,maxEval)
                 alpha = max(alpha,eval)
                 if beta <= alpha:
@@ -169,13 +242,30 @@ class BackgammonPlayer:
             minEval = 1000000
             for x in self.get_all_possible_moves():
                 s = getSourceAndTargetFromMove(x, [1, 6])
-                temp_state = state
+                temp_state = boardState.bgstate(state)
                 if s[0] != []:
-                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[0][0], sum(s[0]), 1 - state.whose_move)
+                    if s[0][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[0]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[0][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]),
+                                                        1 - temp_state.whose_move)
                 if s[1] != []:
-                    temp_state = genmoves.move_from(temp_state, state.whose_move, s[1][0], sum(s[1]), 1 - state.whose_move)
+                    if s[1][0] == -1:
+                        temp_state = genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[1]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[1]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[1][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]),
+                                                        1 - temp_state.whose_move)
+
                 temp_state.whose_move = 1 - temp_state.whose_move
-                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta,True)
+                eval = self.minimaxAB(temp_state, maxply - 1, alpha,beta,maxPlayer)
                 minEval = min(eval,minEval)
                 beta = min(beta,eval)
                 if beta <= alpha:
@@ -198,21 +288,22 @@ class BackgammonPlayer:
                         evalCount[0][i] += len(x)
                     else: #if x[0] == 1:
                         evalCount[1][i] += len(x)
-        evalCount[0][4] = 0 if state.white_off == [] else state.white_off
-        evalCount[1][4] = 0 if state.red_off == [] else state.red_off
+        evalCount[0][4] = 0 if state.white_off == [] else len(state.white_off)
+        evalCount[1][4] = 0 if state.red_off == [] else len(state.red_off)
         for x in state.bar:
-            if x == 0:
-                evalCount[0][5] += 1
-            else: #x == 1
-                evalCount[1][5] += 1
+            if x != []:
+                if x == 0:
+                    evalCount[0][5] += 1
+                else: #x == 1
+                    evalCount[1][5] += 1
 
         #print(evalCount)
-        return 100 * (evalCount[0][5] - evalCount[1][5]) + 90 * (
+        return 100 * (evalCount[0][4] - evalCount[1][4]) + 90 * (
                       evalCount[0][3] - evalCount[1][0]) + 50 * (
                       evalCount[0][2] - evalCount[1][1]) - 50 * (
                       evalCount[0][1] - evalCount[1][2]) - 90 * (
                       evalCount[0][0] - evalCount[1][3]) - 100 * (
-                      evalCount[0][4] - evalCount[1][4])
+                      evalCount[0][5] - evalCount[1][5])
 
     def get_all_possible_moves(self):
         """Uses the mover to generate all legal moves. Returns an array of move commands"""

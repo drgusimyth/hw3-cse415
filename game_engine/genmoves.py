@@ -327,6 +327,7 @@ def targetPointOK(state, who, target):
 def move_to_target(new_state, who, target, opp):
     target_list = new_state.pointLists[target]
     hit(new_state, target_list, target, opp)
+    # new_state.pointLists[target].append(who)
     target_list = new_state.pointLists[target]  # Refetch after possible change from hit.
     target_list.append(who)
 
