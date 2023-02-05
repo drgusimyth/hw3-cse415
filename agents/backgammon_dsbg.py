@@ -40,10 +40,7 @@ class BackgammonPlayer:
     # states as well as the number of cutoffs.
     def statesAndCutoffsCounts(self):
         # TODO: return a tuple containing states and cutoff
-
-        self.count = 0
-        self.cutoff = 0
-        return (self.count, self.cutoff)
+        return (self.states_created, self.ab_cutoffs)
 
     # Given a ply, it sets a maximum for how far an agent
     # should go down in the search tree. maxply=2 indicates that
@@ -302,11 +299,11 @@ class BackgammonPlayer:
                     evalCount[1][5] += 1
 
         #print(evalCount)
-        return 50 * (evalCount[0][4] - evalCount[1][4]) + 60 * (
-                      evalCount[0][3] - evalCount[1][0]) + 80 * (
-                      evalCount[0][2] - evalCount[1][1]) + 90 * (
-                      evalCount[0][1] - evalCount[1][2]) + 120 * (
-                      evalCount[0][0] - evalCount[1][3]) - 90 * (
+        return 2000 * (evalCount[0][4] - evalCount[1][4]) + 1600 * (
+                      evalCount[0][3] - evalCount[1][0]) + 700 * (
+                      evalCount[0][2] - evalCount[1][1]) + 100 * (
+                      evalCount[0][1] - evalCount[1][2]) + 10 * (
+                      evalCount[0][0] - evalCount[1][3]) + 1 * (
                       evalCount[0][5] - evalCount[1][5])
 
     def get_all_possible_moves(self):
