@@ -186,15 +186,15 @@ class BackgammonPlayer:
                     evalCount[1][5] += 1
 
         #print(evalCount)
-        return 50 * (evalCount[0][4] - evalCount[1][4]) + 60 * (
-                      evalCount[0][3] - evalCount[1][0]) + 80 * (
-                      evalCount[0][2] - evalCount[1][1]) + 90 * (
-                      evalCount[0][1] - evalCount[1][2]) + 120 * (
-                      evalCount[0][0] - evalCount[1][3]) - 90 * (
+        return 2000 * (evalCount[0][4] - evalCount[1][4]) + 1600 * (
+                      evalCount[0][3] - evalCount[1][0]) + 700 * (
+                      evalCount[0][2] - evalCount[1][1]) + 100 * (
+                      evalCount[0][1] - evalCount[1][2]) + 10 * (
+                      evalCount[0][0] - evalCount[1][3]) + 1 * (
                       evalCount[0][5] - evalCount[1][5])
 
 
-def getSourceAndTargetFromMove(move,dice=[]):
+def getSourceAndTargetFromMove(move,dice=[1,6]):
     checker_positions = move.split(",")
     #return [[],[]]
     if len(checker_positions) != 0 and checker_positions != [] and checker_positions != None:
