@@ -40,8 +40,10 @@ class BackgammonPlayer:
     # states as well as the number of cutoffs.
     def statesAndCutoffsCounts(self):
         # TODO: return a tuple containing states and cutoff
-        self.count = ()
-        return self.count
+
+        self.count = 0
+        self.cutoff = 0
+        return (self.count, self.cutoff)
 
     # Given a ply, it sets a maximum for how far an agent
     # should go down in the search tree. maxply=2 indicates that
