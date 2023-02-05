@@ -61,40 +61,103 @@ class BackgammonPlayer:
     def move(self, state, die1, die2):
         # TODO: return a move for the current state and for the current player.
         # Hint: you can get the current player with state.whose_move
-
+        maxPlayer = state.whose_move
         self.initialize_move_gen_for_state(state, state.whose_move, die1, die2)
         moves = self.get_all_moves()
-        if len(moves) == 0:
-            return "NO MOVES COULD BE FOUND"
+        if moves == 'p':
+            return 'no moves, pass'
         best_move = None
-        best_score = -2147483649
+        best_score = -1e20
         for x in moves:
-            score = self.expectimax(x, self.maxply, True)
+            s = getSourceAndTargetFromMove(x, [die1, die2])
+            temp_state = genmoves.bgstate(state)
+            if s[0] != []:
+                if s[0][0] == -1:
+                    genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
+                                           1 - temp_state.whose_move)
+                elif sum(s[0]) > 23:
+                    temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[0][0],
+                                                   1 - temp_state.whose_move)
+                else:
+                    temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]),
+                                                    1 - temp_state.whose_move)
+            if s[1] != []:
+                if s[1][0] == -1:
+                    genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[1]),
+                                           1 - temp_state.whose_move)
+                elif sum(s[1]) > 23:
+                    temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[1][0],
+                                                   1 - temp_state.whose_move)
+                else:
+                    temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]),
+                                                    1 - temp_state.whose_move)
+            temp_state.whose_move = 1 - temp_state.whose_move
+            score = self.expectimax(temp_state, self.maxply, maxPlayer, die1, die2)
             if score > best_score:
                 best_move = x
                 best_score = score
         return best_move
 
 
-    def expectimax(self, state, maxply, maxPlayer):
-        self.initialize_move_gen_for_state(state, state.whose_move)
-        moves = self.get_all_moves()
+    def expectimax(self, state, maxply, maxPlayer, die1, die2):
         if maxply == 0:
-            return self.staticEval(self,state)
-        if maxPlayer: # max player's turn
-            maxEval = -2147483649
+            return self.staticEval(state)
+
+        self.initialize_move_gen_for_state(state, state.whose_move, die1, die2)
+        moves = self.get_all_moves()
+
+        if maxPlayer == state.whose_move:
+            maxEval = -1e20
             for x in moves:
-                s = getSourceAndTargetFromMove(x)
-                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
-                eval = self.expectimax(temp_state, maxply - 1, False)
+                s = getSourceAndTargetFromMove(x, [die1, die2])
+                temp_state = genmoves.bgstate(state)
+                if s[0] != []:
+                    if s[0][0] == -1:
+                        genmoves.move_from_bar(temp_state,temp_state.whose_move,sum(s[0]), 1- temp_state.whose_move)
+                    elif sum(s[0]) > 23:
+                        temp_state = genmoves.bear_off(temp_state,temp_state.whose_move,s[0][0], 1-temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]), 1 - temp_state.whose_move)
+                if s[1] != []:
+                    if s[1][0] == -1:
+                        genmoves.move_from_bar(temp_state,temp_state.whose_move,sum(s[1]), 1- temp_state.whose_move)
+                    elif sum(s[1]) > 23:
+                        temp_state = genmoves.bear_off(temp_state,temp_state.whose_move,s[1][0], 1-temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]), 1 - temp_state.whose_move)
+                temp_state.whose_move = 1 - temp_state.whose_move
+                eval = self.expectimax(temp_state, maxply - 1, maxPlayer, die1, die2)
                 maxEval = max(eval, maxEval)
             return maxEval
-        else: #random player's turn
+        else:
             total_eval = 0
             for x in moves:
-                s = getSourceAndTargetFromMove(x)
-                temp_state = genmoves.move_from(state, state.whose_move, s[0], s[1], 1 - state.whose_move)
-                total_eval += self.expectimax(temp_state, maxply - 1, True)
+                s = getSourceAndTargetFromMove(x, [die1, die2])
+                temp_state = genmoves.bgstate(state)
+                if s[0] != []:
+                    if s[0][0] == -1:
+                        genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[0]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[0][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[0][0], sum(s[0]),
+                                                        1 - temp_state.whose_move)
+                if s[1] != []:
+                    if s[1][0] == -1:
+                        genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[1]),
+                                                            1 - temp_state.whose_move)
+                    elif sum(s[1]) > 23:
+                        temp_state = genmoves.bear_off(temp_state, temp_state.whose_move, s[1][0],
+                                                       1 - temp_state.whose_move)
+                    else:
+                        temp_state = genmoves.move_from(temp_state, temp_state.whose_move, s[1][0], sum(s[1]),
+                                                        1 - temp_state.whose_move)
+
+
+                temp_state.whose_move = 1 - temp_state.whose_move
+                total_eval += self.expectimax(temp_state, maxply - 1, maxPlayer, die1, die2)
             expected = total_eval / len(moves)
             return expected
 
@@ -107,46 +170,72 @@ class BackgammonPlayer:
 
         evalCount = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         for i in range(4):
-            for x in state.pointLists[i * 6: (i + 1) * 6]:
+            for x in state.pointLists[i * 6 : (i + 1) * 6]:
                 if x != []:
                     if x[0] == 0:
                         evalCount[0][i] += len(x)
-                    else:  # if x[0] == 1:
+                    else: #if x[0] == 1:
                         evalCount[1][i] += len(x)
-        evalCount[0][4] = 0 if state.white_off == [] else state.white_off
-        evalCount[1][4] = 0 if state.red_off == [] else state.red_off
+        evalCount[0][4] = 0 if state.white_off == [] else len(state.white_off)
+        evalCount[1][4] = 0 if state.red_off == [] else len(state.red_off)
         for x in state.bar:
-            if x == 0:
-                evalCount[0][5] += 1
-            else:  # x == 1
-                evalCount[1][5] += 1
+            if x != []:
+                if x == 0:
+                    evalCount[0][5] += 1
+                else: #x == 1
+                    evalCount[1][5] += 1
 
-        # print(evalCount)
-        return 100 * (evalCount[0][5] - evalCount[1][5]) + 90 * (
-                evalCount[0][3] - evalCount[1][0]) + 50 * (
-                evalCount[0][2] - evalCount[1][1]) - 50 * (
-                evalCount[0][1] - evalCount[1][2]) - 90 * (
-                evalCount[0][0] - evalCount[1][3]) - 100 * (
-                evalCount[0][4] - evalCount[1][4])
+        #print(evalCount)
+        return 50 * (evalCount[0][4] - evalCount[1][4]) + 60 * (
+                      evalCount[0][3] - evalCount[1][0]) + 80 * (
+                      evalCount[0][2] - evalCount[1][1]) + 90 * (
+                      evalCount[0][1] - evalCount[1][2]) + 120 * (
+                      evalCount[0][0] - evalCount[1][3]) - 90 * (
+                      evalCount[0][5] - evalCount[1][5])
 
 
-def getSourceAndTargetFromMove(move):
-    sPt = ''
-    tPt = ''
-    firstOrSencond = True
-    for s in move:
-        if firstOrSencond:
-            if s == 'p':
-                return None
-            elif s != ',':
-                sPt += s
+def getSourceAndTargetFromMove(move,dice=[]):
+    checker_positions = move.split(",")
+    #return [[],[]]
+    if len(checker_positions) != 0 and checker_positions != [] and checker_positions != None:
+        if len(checker_positions) == 1:
+            return [[],[]]
+        elif len(checker_positions) == 2:
+            if checker_positions[0] == 'p':
+                first_part = [int(checker_positions[1]) -1, dice[1]]
+                if int(checker_positions[1]) -1 + dice[1] > 23:
+                    second_part = []
+                else:
+                    second_part = [int(checker_positions[1]) -1 + dice[1], dice[0]]
+            elif checker_positions[1] == 'p':
+                first_part = [int(checker_positions[0]) - 1, dice[0]]
+                if int(checker_positions[0]) -1 + dice[0] > 23:
+                    second_part = []
+                else:
+                    second_part = [int(checker_positions[0]) - 1 + dice[0], dice[1]]
             else:
-                firstOrSencond = False
+                first_part = [int(checker_positions[0]) - 1, dice[0]]
+                second_part = [int(checker_positions[1]) - 1, dice[1]]
+            return [first_part, second_part]
         else:
-            if s == 'p':
-                return None
-            elif s != ',':
-                tPt += s
+            if checker_positions[2] == 'R':
+                if checker_positions[0] == 'p':
+                    first_part = [int(checker_positions[1]) - 1, dice[0]]
+                    if int(checker_positions[1]) - 1 + dice[0] > 23:
+                        second_part = []
+                    else:
+                        second_part = [int(checker_positions[1]) - 1 + dice[0], dice[1]]
+                elif checker_positions[1] == 'p':
+                    first_part = [int(checker_positions[0]) - 1, dice[1]]
+                    if int(checker_positions[0]) - 1 + dice[1] > 23:
+                        second_part = []
+                    else:
+                        second_part = [int(checker_positions[0]) - 1 + dice[1], dice[0]]
+                else:
+                    first_part = [int(checker_positions[0]) - 1, dice[1]]
+                    second_part = [int(checker_positions[1]) - 1, dice[0]]
+                return [first_part, second_part]
             else:
-                break
-    return [int(sPt)-1, int(tPt)-1]
+                return [[],[]]
+    else:
+        return [[],[]]

@@ -69,7 +69,7 @@ class BackgammonPlayer:
         if moves == 'p':
             return 'no moves, pass'
         best_move = None
-        best_score = -21493846950
+        best_score = -1e20
         if self.prune == False:
             for x in moves:
                 self.states_created += 1
