@@ -5,7 +5,7 @@ UW netid(s): yishuf, tommzh
 
 from game_engine import genmoves
 #from game_engine import boardState
-from game_engine.boardState import *
+
 
 class BackgammonPlayer:
 
@@ -75,7 +75,7 @@ class BackgammonPlayer:
             for x in moves:
                 self.states_created += 1
                 s = getSourceAndTargetFromMove(x,[die1,die2])
-                temp_state = bgstate(state)
+                temp_state = genmoves.bgstate(state)
                 if s[0] != []:
                     if s[0][0] == -1:
                         genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
@@ -107,7 +107,7 @@ class BackgammonPlayer:
             for x in moves:
                 self.states_created += 1
                 s = getSourceAndTargetFromMove(x, [die1,die2])
-                temp_state = bgstate(state)
+                temp_state = genmoves.bgstate(state)
                 if s[0] != []:
                     if s[0][0] == -1:
                         genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
@@ -149,7 +149,7 @@ class BackgammonPlayer:
             for x in self.get_all_possible_moves():
                 self.states_created += 1
                 s = getSourceAndTargetFromMove(x, [1, 6])
-                temp_state = bgstate(state)
+                temp_state = genmoves.bgstate(state)
                 if s[0] != []:
                     if s[0][0] == -1:
                         genmoves.move_from_bar(temp_state,temp_state.whose_move,sum(s[0]), 1- temp_state.whose_move)
@@ -173,7 +173,7 @@ class BackgammonPlayer:
             for x in self.get_all_possible_moves():
                 self.states_created += 1
                 s = getSourceAndTargetFromMove(x, [1, 6])
-                temp_state = bgstate(state)
+                temp_state = genmoves.bgstate(state)
                 if s[0] != []:
                     if s[0][0] == -1:
                         genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
@@ -211,7 +211,7 @@ class BackgammonPlayer:
             for x in self.get_all_possible_moves():
                 self.states_created += 1
                 s = getSourceAndTargetFromMove(x,[1,6])
-                temp_state = bgstate(state)
+                temp_state = genmoves.bgstate(state)
                 if s[0] != []:
                     if s[0][0] == -1:
                         genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
@@ -243,7 +243,7 @@ class BackgammonPlayer:
             minEval = 1000000
             for x in self.get_all_possible_moves():
                 s = getSourceAndTargetFromMove(x, [1, 6])
-                temp_state = bgstate(state)
+                temp_state = genmoves.bgstate(state)
                 if s[0] != []:
                     if s[0][0] == -1:
                         genmoves.move_from_bar(temp_state, temp_state.whose_move, sum(s[0]),
@@ -300,10 +300,10 @@ class BackgammonPlayer:
                     evalCount[1][5] += 1
 
         #print(evalCount)
-        return 200 * (evalCount[0][4] - evalCount[1][4]) + 100 * (
-                      evalCount[0][3] - evalCount[1][0]) + 50 * (
-                      evalCount[0][2] - evalCount[1][1]) + 10 * (
-                      evalCount[0][1] - evalCount[1][2]) + 5 * (
+        return 50 * (evalCount[0][4] - evalCount[1][4]) + 60 * (
+                      evalCount[0][3] - evalCount[1][0]) + 80 * (
+                      evalCount[0][2] - evalCount[1][1]) + 90 * (
+                      evalCount[0][1] - evalCount[1][2]) + 120 * (
                       evalCount[0][0] - evalCount[1][3]) - 90 * (
                       evalCount[0][5] - evalCount[1][5])
 
