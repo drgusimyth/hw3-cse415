@@ -300,11 +300,11 @@ class BackgammonPlayer:
                     evalCount[1][5] += 1
 
         #print(evalCount)
-        return 100 * (evalCount[0][4] - evalCount[1][4]) + 90 * (
+        return 200 * (evalCount[0][4] - evalCount[1][4]) + 100 * (
                       evalCount[0][3] - evalCount[1][0]) + 50 * (
-                      evalCount[0][2] - evalCount[1][1]) - 50 * (
-                      evalCount[0][1] - evalCount[1][2]) - 90 * (
-                      evalCount[0][0] - evalCount[1][3]) - 100 * (
+                      evalCount[0][2] - evalCount[1][1]) + 10 * (
+                      evalCount[0][1] - evalCount[1][2]) + 5 * (
+                      evalCount[0][0] - evalCount[1][3]) - 90 * (
                       evalCount[0][5] - evalCount[1][5])
 
     def get_all_possible_moves(self):
@@ -334,24 +334,38 @@ def getSourceAndTargetFromMove(move,dice=[1,6]):
         elif len(checker_positions) == 2:
             if checker_positions[0] == 'p':
                 first_part = [int(checker_positions[1]) -1, dice[1]]
-                second_part = [int(checker_positions[1]) -1 + dice[1], dice[0]]
+                if int(checker_positions[1]) -1 + dice[1] > 23:
+                    second_part = []
+                else:
+                    second_part = [int(checker_positions[1]) -1 + dice[1], dice[0]]
             elif checker_positions[1] == 'p':
                 first_part = [int(checker_positions[0]) - 1, dice[0]]
-                second_part = [int(checker_positions[0]) - 1 + dice[0], dice[1]]
+                if int(checker_positions[0]) -1 + dice[0] > 23:
+                    second_part = []
+                else:
+                    second_part = [int(checker_positions[0]) - 1 + dice[0], dice[1]]
             else:
                 first_part = [int(checker_positions[0]) - 1, dice[0]]
                 second_part = [int(checker_positions[1]) - 1, dice[1]]
+            return [first_part, second_part]
         else:
             if checker_positions[2] == 'R':
                 if checker_positions[0] == 'p':
                     first_part = [int(checker_positions[1]) - 1, dice[0]]
-                    second_part = [int(checker_positions[1]) - 1 + dice[0], dice[1]]
+                    if int(checker_positions[1]) - 1 + dice[0] > 23:
+                        second_part = []
+                    else:
+                        second_part = [int(checker_positions[1]) - 1 + dice[0], dice[1]]
                 elif checker_positions[1] == 'p':
                     first_part = [int(checker_positions[0]) - 1, dice[1]]
-                    second_part = [int(checker_positions[0]) - 1 + dice[1], dice[0]]
+                    if int(checker_positions[0]) - 1 + dice[1] > 23:
+                        second_part = []
+                    else:
+                        second_part = [int(checker_positions[0]) - 1 + dice[1], dice[0]]
                 else:
                     first_part = [int(checker_positions[0]) - 1, dice[1]]
                     second_part = [int(checker_positions[1]) - 1, dice[0]]
+                return [first_part, second_part]
             else:
                 return [[],[]]
     else:
